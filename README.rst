@@ -2,25 +2,19 @@
 How to install
 ==============
 ***************************
-Configure virtualenvwrapper
+Configure virtualenv
 ***************************
 For convenience you should use `virtualenvwrapper <http://virtualenvwrapper.readthedocs.io/en/latest/>`_::
 
- sudo pip install virtualenvwrapper
-
-Add three lines to /etc/environment or another shell startup file::
-
- export WORKON_HOME=$HOME/.virtualenvs
- export PROJECT_HOME=$HOME/python_dev
- source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+ sudo pip install virtualenv
 
 Create a new virtual environment::
 
- mkvirtualenv confluence_dumper_venv
+    python3 -m venv venv
 
 Enter the virtual environment::
 
- workon confluence_dumper_venv
+    . venv/bin/activate
 
 ***************************
 Configure confluence dumper
@@ -41,7 +35,7 @@ How to use
 ==========
 Don't forget to switch to the virtual environment because of the installed dependencies::
 
- workon confluence_dumper_venv
+ . venv/bin/activate
 
 Run confluence dumper::
 
