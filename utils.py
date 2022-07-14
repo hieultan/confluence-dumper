@@ -14,6 +14,7 @@ import requests
 import shutil
 import re
 import urllib
+import urllib.parse
 
 
 class ConfluenceException(Exception):
@@ -75,8 +76,13 @@ def write_2_file(path, content):
     """
     try:
         with open(path, 'w') as the_file:
-            the_file.write(content.encode('utf8'))
-    except:
+            written_content = content
+            if isinstance(written_content, bytes):
+                written_content = written_content.decode('UTF-8')
+            the_file.write(written_content)
+    except Exception as e:
+        import pdb
+        pdb.set_trace()
         print("File could not be written")
 
 def write_html_2_file(path, title, content, html_template, additional_headers=None):
@@ -97,7 +103,7 @@ def write_html_2_file(path, title, content, html_template, additional_headers=No
     # Note: One backslash has to be escaped with two avoid that backslashes are interpreted as escape chars
     replacements = {'title': title, 'content': content, 'additional_headers': additional_html_headers}
 
-    for placeholder, replacement in replacements.iteritems():
+    for placeholder, replacement in replacements.items():
         regex_placeholder = r'{%\s*' + placeholder + r'\s*%\}'
         try:
             html_content = re.sub(regex_placeholder, replacement.replace('\\', '\\\\'), html_content,
@@ -114,6 +120,8 @@ def sanitize_for_filename(original_string):
     :param original_string: Original string to sanitize
     :returns: Sanitized string/filename
     """
+    if isinstance(original_string, bytes):
+        original_string = original_string.decode('UTF-8')
     sanitized_file_name = re.sub('[\\\\/:*?\"<>|]', '_', original_string)
     return sanitized_file_name
 
@@ -124,7 +132,7 @@ def decode_url(encoded_url):
     :param encoded_url: Encoded URL.
     :returns: Decoded URL.
     """
-    return urllib.unquote(encoded_url.encode('utf8')).decode('utf8')
+    return urllib.parse.unquote(encoded_url.encode('utf8'))
 
 
 def encode_url(decoded_url):
@@ -133,7 +141,7 @@ def encode_url(decoded_url):
     :param decoded_url: Decoded URL.
     :returns: Encoded URL.
     """
-    return urllib.quote(decoded_url.encode('utf8')).encode('utf8')
+    return urllib.parse.quote(decoded_url.encode('utf8')).encode('utf8')
 
 
 def is_file_format(file_name, file_extensions):
