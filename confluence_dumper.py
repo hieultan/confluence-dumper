@@ -170,10 +170,12 @@ def handle_html_references(html_content, page_duplicate_file_names, page_file_ma
     xpath_expr = '|'.join(possible_image_xpaths)
     for img_element in html_tree.xpath(xpath_expr):
         # Replace file path
-        file_url = img_element.attrib['src']
-        file_name = derive_downloaded_file_name(file_url)
+        file_url = img_element.attrib['data-image-src']
+        file_name = derive_downloaded_file_name(file_url.replace(settings.CONFLUENCE_BASE_URL, ''))
         relative_file_path = '%s/%s' % (settings.DOWNLOAD_SUB_FOLDER, file_name)
         img_element.attrib['src'] = relative_file_path
+        img_element.attrib['data-image-src'] = relative_file_path
+        img_element.attrib['srcset'] = relative_file_path
 
         # Add alt attribute if it does not exist yet
         if not 'alt' in img_element.attrib.keys():
@@ -341,6 +343,8 @@ def fetch_page_recursively(page_id, folder_path, download_folder, html_template,
         page_content = handle_html_references(page_content, page_duplicate_file_names, page_file_matching,
                                               depth=depth+1)
         file_path = '%s/%s' % (folder_path, file_name)
+        if isinstance(page_content, bytes):
+            page_content = page_content.decode('UTF-8')
         page_content += create_html_attachment_index(path_collection['child_attachments'])
         utils.write_html_2_file(file_path, page_title, page_content, html_template)
 
